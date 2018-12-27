@@ -10,18 +10,42 @@ import {
   TextInput
 } from 'react-native';
 import { WebBrowser } from 'expo';
-
+import { connect } from 'react-redux';
 import { MonoText } from '../components/StyledText';
 import Card from '../components/IncomeCard';
 import HomeCard from '../components/Home-Card';
 import AppBar from '../components/AppBar';
 
-export default class FactorListScreen extends React.Component {
+class FactorListScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
 
   render() {
+    let total = 0;
+    let listItems = [];
+    this.props.data.map( (item, i) => {
+      if (item.get('type') !== 'income') {
+        return;
+      };
+      let element = (
+        <Card 
+          image={require('../assets/images/money.png')}
+          startText=""
+          valueText={item.get('amount')}
+          valueStyle={{}}
+          endText={item.get('name')}
+          onPress={ (val) => this._updateReceivedIncome(i, item, val) }
+          valueReceived={item.get('amount') === item.get('value')}
+          incremental={item.get('incremental')}
+          maxAmount={item.get('amount')}
+        />
+      );
+      listItems.push(element);
+      if (item.get('amount') !== item.get('value')) {
+        total += item.get('amount');
+      }
+    });
     return (
       <View style={styles.container}>
         <AppBar 
@@ -33,64 +57,14 @@ export default class FactorListScreen extends React.Component {
           <HomeCard 
             image={require('../assets/images/money-bag.png')}
             startText="Total money incoming:"
-            valueText="$2000"
+            valueText={"$" + total}
             valueStyle={{color: 'green'}}
             endText=""
             onPress={null}
           ></HomeCard>
         </View>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <Card 
-            image={require('../assets/images/money.png')}
-            startText=""
-            valueText="$500"
-            valueStyle={{}}
-            endText="Work paycheque"
-            onPress={null}
-          />
-          <Card 
-            image={require('../assets/images/money.png')}
-            startText=""
-            valueText="$500"
-            valueStyle={{}}
-            endText="Work paycheque"
-            onPress={null}
-          />
-          <Card 
-            image={require('../assets/images/money.png')}
-            startText=""
-            valueText="$650"
-            valueStyle={{}}
-            endText="Child benefit"
-            onPress={null}
-          />
-          <Card 
-            image={require('../assets/images/money.png')}
-            startText=""
-            valueText="$100"
-            valueStyle={{}}
-            endText="Tax Returns"
-            //onPress={ ()=> alert('fart')}
-            onPress={null}
-          />
-          <Card 
-            image={require('../assets/images/money.png')}
-            startText=""
-            valueText="$100"
-            valueStyle={{}}
-            endText="Tax Returns"
-            //onPress={ ()=> alert('fart')}
-            onPress={null}
-          />
-          <Card 
-            image={require('../assets/images/money.png')}
-            startText=""
-            valueText="$100"
-            valueStyle={{}}
-            endText="Tax Returns"
-            //onPress={ ()=> alert('fart')}
-            onPress={null}
-          />
+          {listItems}
         </ScrollView>
         {/* <View style={styles.tabBarInfoContainer}>
           <Image
@@ -110,14 +84,16 @@ export default class FactorListScreen extends React.Component {
     );
   }
 
-  _handleLearnMorePress = () => {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
+  _renderList(){
+   
+  }
 
-  _handleHelpPress = () => {
-    WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
+  _updateReceivedIncome = (index, item, val) => {
+    this.props.dispatch({
+      type: 'updateFactor',
+      index,
+      data: item.set("value", val)
+    });
   };
 }
 
@@ -232,3 +208,11 @@ const styles = StyleSheet.create({
     paddingLeft: 5
   },
 });
+
+function select(state){
+  return {
+    data: state.spendableFactors.data,
+  }
+}
+
+export default connect(select)(FactorListScreen);

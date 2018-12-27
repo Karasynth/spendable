@@ -42,43 +42,19 @@ export default class TabBarIcon extends React.Component {
           </Text>
         </View>
         <View style={styles.actionContainer}>
-            {/* <TouchableOpacity
-                onPress={this.props.onPress}
-                //style={this.props.onPress? {} : {opacity: 0}}
-            >
-
-                <Button
-                    onPress={() => {}}
-                    title="Got it"
-                    color="#2ecc71"
-                    accessibilityLabel="Got it"
-                    disabled={this.props.valueReceived}
-                >
-                </Button>
-            </TouchableOpacity>
-            { this.props.valueReceived 
-            
-                ?
-                <TouchableOpacity
-                    onPress={this.props.onPress}
-                    //style={this.props.onPress? {} : {opacity: 0}}
-                    style={{paddingLeft: 5, paddingTop: 5}}
-                >
-                    <Image
-                        source={require('../assets/images/reload.png')}
-                        style={styles.reloadImage}
-                    />
-                </TouchableOpacity>
-                :null
-            } */}
-            <Switch
-                value={!this.props.valueReceived}
-                trackColor="#2ecc71"
-                onValueChange={ () => {}}
-            />
+          <Switch
+            value={!this.props.valueReceived}
+            trackColor="#2ecc71"
+            onValueChange={() => this._update()}
+          />
         </View>
       </View>
     );
+  }
+  _update(){
+    console.log(this.props)
+    let value = this.props.valueReceived? 0 : this.props.maxAmount
+    this.props.onPress(value);
   }
 };
 
