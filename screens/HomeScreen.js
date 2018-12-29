@@ -35,9 +35,12 @@ class HomeScreen extends React.Component {
         }
       }
       else if (item.get('type') === 'outcome') {
-        if (!matchedAmount) {
-          totalOutgoing += item.get('amount');
+        if (item.get('incremental')){
+          totalOutgoing += item.get('amount') - item.get('value');
         }
+        else if (!matchedAmount) {
+          totalOutgoing += item.get('amount');
+        };
       };
     });
     let spendable = ( this.props.balance + this.props.overdraftLimit ) + (totalIncoming - totalOutgoing);
@@ -88,7 +91,7 @@ class HomeScreen extends React.Component {
             /> 
           </HomeCard>
           <HomeCard 
-            image={require('../assets/images/stack-of-money.png')}
+            image={require('../assets/images/receipt.png')}
             startText="Max Overdraft:"
             valueText=""
             endText=" "
@@ -125,7 +128,10 @@ class HomeScreen extends React.Component {
     const action = StackActions.push({
       routeName: 'Incoming',
       params: {
-        myUserId: 9,
+        type: 'income',
+        color: "#666666",
+        title: "Incoming",
+        icon: require('../assets/images/money.png'),
       },
     });
     this.props.navigation.dispatch(action);
@@ -133,9 +139,12 @@ class HomeScreen extends React.Component {
 
   _handleOutgoingPress = () => {
     const action = StackActions.push({
-      routeName: 'Outgoing',
+      routeName: 'Incoming',
       params: {
-        myUserId: 9,
+        type: 'outcome',
+        color: "#e74c3c",
+        title: "Outgoing",
+        icon: require('../assets/images/bill.png'),
       },
     });
     this.props.navigation.dispatch(action);

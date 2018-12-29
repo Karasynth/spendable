@@ -24,41 +24,81 @@ class FactorListScreen extends React.Component {
   render() {
     let total = 0;
     let listItems = [];
+    let params = this.props.navigation.state.params;
     this.props.data.map( (item, i) => {
-      if (item.get('type') !== 'income') {
+    console.log(params.type, item.get('type'));
+    if (item.get('type') !== params.type ) {
         return;
       };
-      let element = (
-        <Card 
-          image={require('../assets/images/money.png')}
-          startText=""
-          valueText={item.get('amount')}
-          valueStyle={{}}
-          endText={item.get('name')}
-          onPress={ (val) => this._updateReceivedIncome(i, item, val) }
-          valueReceived={item.get('amount') === item.get('value')}
-          incremental={item.get('incremental')}
-          maxAmount={item.get('amount')}
-        />
-      );
-      listItems.push(element);
-      if (item.get('amount') !== item.get('value')) {
-        total += item.get('amount');
+      let element;
+      if (item.get("incremental")) {
+        element = (
+          <HomeCard 
+            image={require('../assets/images/money.png')}
+            startText=""
+            valueText=""
+            endText={item.get("name")}
+            onPress={null}
+          >
+            <View style={{flexDirection: 'row'}}>
+              <TextInput 
+                value={"" + item.get("value")}
+                onChangeText={ (val) => this._updateReceivedIncome(i, item, val) }
+                style={styles.balanceInput}
+                keyboardType="number-pad"
+              />
+              <View style={{padding: 5}}>
+                <Text>
+                  {"/" + item.get("amount")}
+                </Text>
+              </View> 
+            </View> 
+          </HomeCard>
+        );
+        total += item.get('amount') - item.get('value');
       }
+      else {
+        element = (
+          <Card 
+            image={require('../assets/images/money.png')}
+            startText=""
+            valueText={item.get('amount')}
+            valueStyle={{}}
+            endText={item.get('name')} 
+            onPress={ (val) => this._updateReceivedIncome(i, item, val) }
+            valueReceived={item.get('amount') === item.get('value')}
+            incremental={item.get('incremental')}
+            maxAmount={item.get('amount')}
+          />
+        );
+        if (item.get('amount') !== item.get('value')) {
+          total += item.get('amount');
+        }
+      }
+      listItems.push(element);
     });
+
+    let totalText = "Total money incoming:";
+    let totalColor = "green";
+    let totalIcon = require('../assets/images/money-bag.png');
+    if (params.type == 'outcome') {
+      totalText = "Total money outgoing:";
+      totalColor = "red";
+      totalIcon = require('../assets/images/bill.png'); 
+    };
     return (
       <View style={styles.container}>
         <AppBar 
-            title="Incoming"
-            image={require('../assets/images/money.png')}
-            backgroundColor="#666666"
+            title={params.title}
+            image={params.icon}
+            backgroundColor={params.color}
         />
         <View style={{backgroundColor: '#eee'}}>
           <HomeCard 
-            image={require('../assets/images/money-bag.png')}
-            startText="Total money incoming:"
+            image={totalIcon}
+            startText={totalText}
             valueText={"$" + total}
-            valueStyle={{color: 'green'}}
+            valueStyle={{color: totalColor }}
             endText=""
             onPress={null}
           ></HomeCard>
@@ -66,26 +106,8 @@ class FactorListScreen extends React.Component {
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           {listItems}
         </ScrollView>
-        {/* <View style={styles.tabBarInfoContainer}>
-          <Image
-            source={require('../assets/images/stack-of-money.png')}
-            style={styles.balanceImage}
-          />
-          <View style={{marginLeft: 10,}}>
-            <Text style={styles.tabBarInfoText}>Maximum Overdraft:</Text>
-            <TextInput 
-              value={"2000"}
-              style={styles.balanceInput}
-              keyboardType="number-pad"
-            />
-          </View>
-        </View> */}
       </View>
     );
-  }
-
-  _renderList(){
-   
   }
 
   _updateReceivedIncome = (index, item, val) => {
@@ -202,7 +224,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: "#eee", 
     borderRadius: 5, 
-    width: "100%",
+    width: 120,
     backgroundColor: 'white',
     //marginLeft: 10,
     paddingLeft: 5

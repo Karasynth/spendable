@@ -48,6 +48,15 @@ const initialState = {
             value: 0,
             type: "outcome",
             incremental: false
+        },
+        {
+            id: "115",
+            name: "Groceries",
+            icon: 'house',
+            amount: 500,
+            value: 100,
+            type: "outcome",
+            incremental: true
         }
 
 
